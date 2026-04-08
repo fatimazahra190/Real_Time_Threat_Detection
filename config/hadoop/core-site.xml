@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+    core-site.xml — Configuration principale Hadoop
+    Utilise des variables d'environnement pour mode solo ou cluster.
+-->
+<configuration>
+
+    <!-- Systeme de fichiers par defaut : HDFS -->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://hadoop-hdfs:9000</value>
+        <description>URI du NameNode HDFS. Correspond au nom du conteneur Docker.</description>
+    </property>
+
+    <!-- Timeout de connexion client (ms) -->
+    <property>
+        <name>ipc.client.connect.timeout</name>
+        <value>20000</value>
+    </property>
+
+    <!-- Nombre de retentatives de connexion -->
+    <property>
+        <name>ipc.client.connect.max.retries</name>
+        <value>10</value>
+    </property>
+
+    <!-- Activer la compression Snappy pour les fichiers Parquet -->
+    <property>
+        <name>io.compression.codecs</name>
+        <value>org.apache.hadoop.io.compress.GzipCodec,
+               org.apache.hadoop.io.compress.DefaultCodec,
+               org.apache.hadoop.io.compress.SnappyCodec</value>
+    </property>
+
+    <!-- Repertoire temporaire Hadoop -->
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/hadoop/tmp</value>
+    </property>
+
+</configuration>

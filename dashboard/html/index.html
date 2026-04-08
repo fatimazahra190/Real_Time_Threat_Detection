@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSec — Dashboard de Detection des Menaces</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js depuis CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+
+<!-- ── En-tete ────────────────────────────────────────────────────── -->
+<header class="header">
+    <div class="header-left">
+        <div class="logo">🛡️ CyberSec SIEM</div>
+        <div class="subtitle">Architecture Lambda — Detection de Menaces en Temps Reel</div>
+    </div>
+    <div class="header-right">
+        <div class="system-status" id="system-status">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Connexion...</span>
+        </div>
+        <div class="last-update" id="last-update">—</div>
+    </div>
+</header>
+
+<!-- ── Cartes metriques ───────────────────────────────────────────── -->
+<section class="metrics-row">
+    <div class="metric-card critical">
+        <div class="metric-icon">🚨</div>
+        <div class="metric-value" id="metric-critical">—</div>
+        <div class="metric-label">Alertes CRITICAL</div>
+    </div>
+    <div class="metric-card high">
+        <div class="metric-icon">⚠️</div>
+        <div class="metric-value" id="metric-high">—</div>
+        <div class="metric-label">Alertes HIGH</div>
+    </div>
+    <div class="metric-card blocked">
+        <div class="metric-icon">🔒</div>
+        <div class="metric-value" id="metric-blocked">—</div>
+        <div class="metric-label">IPs a BLOQUER</div>
+    </div>
+    <div class="metric-card total">
+        <div class="metric-icon">📊</div>
+        <div class="metric-value" id="metric-total">—</div>
+        <div class="metric-label">Total Alertes (24h)</div>
+    </div>
+</section>
+
+<!-- ── Grille principale ──────────────────────────────────────────── -->
+<main class="grid">
+
+    <!-- Alertes temps reel -->
+    <section class="card card-wide" id="section-alerts">
+        <div class="card-header">
+            <h2>🔴 Alertes Actives <span class="badge" id="badge-alerts">0</span></h2>
+            <div class="card-actions">
+                <select id="filter-severity" onchange="filterAlerts()">
+                    <option value="ALL">Toutes severites</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="LOW">LOW</option>
+                </select>
+                <span class="refresh-indicator" id="refresh-indicator">●</span>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="alerts-table">
+                <thead>
+                    <tr>
+                        <th>IP Source</th>
+                        <th>Type d'Alerte</th>
+                        <th>Severite</th>
+                        <th>Score</th>
+                        <th>Evenements</th>
+                        <th>Bytes</th>
+                        <th>Derniere Vue</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="alerts-tbody">
+                    <tr class="loading-row"><td colspan="8">⏳ Chargement des alertes...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Graphique distribution attaques (donut) -->
+    <section class="card">
+        <div class="card-header">
+            <h2>🍩 Types d'Attaques</h2>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-attack-types"></canvas>
+        </div>
+    </section>
+
+    <!-- Top 10 IPs malveillantes -->
+    <section class="card">
+        <div class="card-header">
+            <h2>🎯 Top IPs Malveillantes</h2>
+            <small class="card-subtitle">Donnees batch</small>
+        </div>
+        <div id="top-ips-container">
+            <div class="loading">⏳ Chargement...</div>
+        </div>
+    </section>
+
+    <!-- Graphique timeline -->
+    <section class="card card-wide">
+        <div class="card-header">
+            <h2>📈 Evolution Temporelle des Menaces</h2>
+            <button class="btn-refresh" onclick="fetchTimeline()">↻ Rafraichir</button>
+        </div>
+        <div class="chart-container chart-container-wide">
+            <canvas id="chart-timeline"></canvas>
+        </div>
+    </section>
+
+    <!-- Recherche IP -->
+    <section class="card">
+        <div class="card-header">
+            <h2>🔍 Analyser une IP</h2>
+        </div>
+        <div class="ip-search">
+            <input type="text" id="ip-input" placeholder="Ex: 192.168.1.45"
+                   onkeydown="if(event.key==='Enter') searchIP()">
+            <button class="btn-primary" onclick="searchIP()">Analyser</button>
+        </div>
+        <div id="ip-result" class="ip-result hidden"></div>
+    </section>
+
+    <!-- Statut systeme -->
+    <section class="card">
+        <div class="card-header">
+            <h2>🖥️ Statut Systeme</h2>
+        </div>
+        <div id="system-components">
+            <div class="component-row">
+                <span>API REST</span>
+                <span class="component-status" id="comp-api">—</span>
+            </div>
+            <div class="component-row">
+                <span>HBase (Batch)</span>
+                <span class="component-status" id="comp-hbase">—</span>
+            </div>
+            <div class="component-row">
+                <span>Cassandra (Speed)</span>
+                <span class="component-status" id="comp-cassandra">—</span>
+            </div>
+            <div class="component-row">
+                <span>Architecture</span>
+                <span class="component-status up">Lambda ✓</span>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────────────────── -->
+<footer class="footer">
+    CyberSec Threat Detection System — Architecture Lambda (Batch + Speed + Serving)
+    | Refresh alertes: 5s | Stats: 60s
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

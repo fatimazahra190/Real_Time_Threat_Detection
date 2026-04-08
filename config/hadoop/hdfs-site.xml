@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+    hdfs-site.xml — Configuration du systeme de fichiers HDFS
+    Optimise pour le mode single-node de developpement.
+-->
+<configuration>
+
+    <!-- Replication = 1 en dev (pas de DataNode supplementaire) -->
+    <property>
+        <n>dfs.replication</n>
+        <value>1</value>
+        <description>Facteur de replication. 1 en dev, 3 en production.</description>
+    </property>
+
+    <!-- Repertoire de stockage du NameNode -->
+    <property>
+        <n>dfs.namenode.name.dir</n>
+        <value>/hadoop/dfs/name</value>
+    </property>
+
+    <!-- Repertoire de stockage des DataNodes -->
+    <property>
+        <n>dfs.datanode.data.dir</n>
+        <value>/hadoop/dfs/data</value>
+    </property>
+
+    <!-- Taille de bloc : 128 Mo (standard Big Data) -->
+    <property>
+        <n>dfs.blocksize</n>
+        <value>134217728</value>
+        <description>128 Mo = 134217728 bytes</description>
+    </property>
+
+    <!-- Desactiver le Safe Mode automatique en dev -->
+    <property>
+        <n>dfs.namenode.safemode.threshold-pct</n>
+        <value>0</value>
+        <description>0 = pas de Safe Mode. En prod, remettre a 0.999.</description>
+    </property>
+
+    <!-- Desactiver la verification du hostname pour le mode Docker -->
+    <property>
+        <n>dfs.namenode.datanode.registration.ip-hostname-check</n>
+        <value>false</value>
+    </property>
+
+    <!-- Activer les permissions (optionnel en dev) -->
+    <property>
+        <n>dfs.permissions.enabled</n>
+        <value>false</value>
+        <description>false en dev pour simplifier. Activer en prod.</description>
+    </property>
+
+</configuration>

@@ -1,0 +1,45 @@
+# ── Environnement ────────────────────────────────────────────────────
+.env
+.env.cluster
+*.env
+
+# ── Java / Maven ──────────────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+!**/src/test/**/*.jar
+
+# ── Python ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+.venv/
+venv/
+
+# ── IDE ───────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# ── Logs ─────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Checkpoints Spark Streaming ──────────────────────────────────────
+/tmp/checkpoint/
+
+# ── Donnees locales ───────────────────────────────────────────────────
+data/
+*.csv
+*.parquet
+
+# ── Docker volumes ────────────────────────────────────────────────────
+# (les volumes sont dans /var/lib/docker, pas dans le repo)
